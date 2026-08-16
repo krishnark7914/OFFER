@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MegaSale — Unbelievable Offers!</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f4f4f4; min-height: 100vh; }
+
+  /* ===== TOP DISCLOSURE BANNER (always visible — this is a training demo) ===== */
+  .disclosure {
+    background: #111; color: #ffd54f; text-align: center;
+    padding: 8px 12px; font-size: 13px; font-weight: 600; letter-spacing: .3px;
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  /* ===== FAKE SCAM PAGE ===== */
+  .scam-page { max-width: 480px; margin: 0 auto; background: #fff; min-height: 100vh; }
+  .hero {
+    background: linear-gradient(135deg, #ff512f, #dd2476);
+    color: #fff; text-align: center; padding: 36px 20px 28px;
+  }
+  .brand { font-size: 28px; font-weight: 800; letter-spacing: 1px; }
+  .brand span { color: #ffe000; }
+  .offer-badge {
+    display: inline-block; background: #ffe000; color: #d81b60;
+    font-size: 40px; font-weight: 900; padding: 10px 26px; border-radius: 12px;
+    margin: 18px 0 10px; transform: rotate(-3deg);
+    box-shadow: 0 6px 18px rgba(0,0,0,.25); animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse { 0%,100% { transform: rotate(-3deg) scale(1);} 50% { transform: rotate(-3deg) scale(1.06);} }
+  .hero p { font-size: 15px; opacity: .95; }
+  .timer {
+    background: #111; color: #ff5252; font-size: 22px; font-weight: 800;
+    padding: 8px; font-variant-numeric: tabular-nums;
+  }
+  .card { padding: 24px 20px; }
+  .product {
+    display: flex; gap: 14px; align-items: center; border: 1px solid #ddd;
+    border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa;
+  }
+  .thumb { width: 64px; height: 64px; background: #e0e0e0; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .p-name { font-weight: 700; font-size: 14px; }
+  .p-price { margin-top: 4px; font-size: 13px; color: #555; }
+  .p-price b { color: #2e7d32; font-size: 16px; }
+  .strike { text-decoration: line-through; color: #999; }
+  form { margin-top: 8px; }
+  label { font-size: 13px; font-weight: 600; color: #333; display: block; margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 13px; font-size: 16px; border: 1.5px solid #ccc;
+    border-radius: 8px; margin-bottom: 14px;
+  }
+  .cta {
+    width: 100%; padding: 15px; font-size: 17px; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, #ff512f, #dd2476); border: none;
+    border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(221,36,118,.4);
+  }
+  .cta:active { transform: scale(.98); }
+  .hint { font-size: 12px; color: #888; text-align: center; margin-top: 10px; }
+  .spinner {
+    display: inline-block; width: 16px; height: 16px; border: 3px solid #fff;
+    border-top-color: transparent; border-radius: 50%; vertical-align: -3px;
+    animation: spin .7s linear infinite; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg);} }
+  .error { color: #d32f2f; font-size: 13px; margin-bottom: 10px; display: none; }
+
+  /* Spin-the-wheel card */
+  .wheel-card {
+    border: 2px dashed #dd2476; border-radius: 12px; padding: 18px;
+    text-align: center; margin: 4px 0 18px; background: #fff8fa;
+  }
+  .wheel-card h3 { font-size: 17px; color: #d81b60; margin-bottom: 4px; }
+  .wheel-card p { font-size: 13px; color: #555; margin-bottom: 12px; }
+  .wheel {
+    width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 12px;
+    border: 6px solid #ffd54f; position: relative;
+    background: conic-gradient(#dd2476 0 90deg, #ff512f 90deg 180deg, #7b1fa2 180deg 270deg, #ffa726 270deg 360deg);
+    transition: transform 4s cubic-bezier(.2,.8,.2,1);
+  }
+  .wheel::after {
+    content: "🎁"; position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center; font-size: 40px;
+  }
+  .pointer {
+    width: 0; height: 0; margin: -4px auto 0; position: relative; z-index: 2;
+    border-left: 12px solid transparent; border-right: 12px solid transparent;
+    border-top: 18px solid #111;
+  }
+  .spin-btn {
+    padding: 12px 34px; font-size: 16px; font-weight: 800; color: #fff;
+    background: #111; border: none; border-radius: 8px; cursor: pointer;
+  }
+  .spin-btn:disabled { opacity: .6; cursor: wait; }
+  .wheel-win {
+    display: none; margin-top: 12px; font-weight: 800; color: #2e7d32;
+    font-size: 15px; animation: pulse 1.2s infinite;
+  }
+
+  /* Scratch-card coupon */
+  .coupon-stage { text-align: center; }
+  .coupon-stage h3 { font-size: 20px; color: #2e7d32; margin-bottom: 4px; }
+  .coupon-stage p { font-size: 14px; color: #555; margin-bottom: 16px; }
+  .scratch-wrap {
+    position: relative; width: 300px; max-width: 100%; height: 110px;
+    margin: 0 auto; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  }
+  .scratch-under {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; background: linear-gradient(135deg,#1b5e20,#2e7d32);
+    color: #fff;
+  }
+  .scratch-under .code { font-size: 26px; font-weight: 900; letter-spacing: 3px; }
+  .scratch-under .sub { font-size: 11px; opacity: .85; margin-top: 2px; }
+  #scratchCanvas { position: absolute; inset: 0; cursor: coin, pointer; touch-action: none; }
+  .scratch-done {
+    display: none; margin-top: 18px; font-weight: 800; color: #2e7d32;
+    font-size: 15px; animation: pulse 1.2s infinite;
+  }
+
+  /* Hidden easter-egg coupon: invisible clickable spot on the hint line */
+  .egg-zone { display: inline-block; width: 46px; height: 12px; cursor: default; }
+  .coupon-modal {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    z-index: 100; align-items: center; justify-content: center; padding: 20px;
+  }
+  .coupon-box {
+    background: #fff; border-radius: 14px; max-width: 400px; width: 100%;
+    padding: 28px 24px; text-align: center; animation: pop .3s ease;
+  }
+  @keyframes pop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .coupon-box .tix { font-size: 54px; }
+  .coupon-box h2 { color: #d81b60; font-size: 22px; margin: 8px 0; }
+  .coupon-box p { font-size: 14px; color: #444; line-height: 1.5; }
+  .coupon-box .code {
+    display: inline-block; margin: 14px 0; padding: 8px 18px; font-weight: 800;
+    font-size: 18px; letter-spacing: 2px; border: 2px dashed #d81b60;
+    border-radius: 8px; color: #d81b60;
+  }
+  .coupon-box .twist { margin-top: 12px; font-weight: 700; color: #c62828; }
+
+  /* ===== REVEAL PAGE ===== */
+  .reveal { display: none; max-width: 640px; margin: 0 auto; padding: 32px 20px 60px; }
+  .reveal-head { text-align: center; margin-bottom: 24px; }
+  .big-x { font-size: 64px; }
+  .reveal-head h1 { color: #c62828; font-size: 30px; margin-top: 8px; }
+  .reveal-head p { color: #555; margin-top: 8px; font-size: 16px; }
+  .redflag {
+    background: #fff; border-left: 5px solid #c62828; border-radius: 6px;
+    padding: 16px 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .redflag h3 { font-size: 16px; color: #c62828; margin-bottom: 6px; }
+  .redflag p { font-size: 14px; color: #444; line-height: 1.5; }
+  .good { border-left-color: #2e7d32; }
+  .good h3 { color: #2e7d32; }
+  .rules { margin-top: 28px; background: #e8f5e9; border-radius: 10px; padding: 20px; }
+  .rules h2 { color: #1b5e20; font-size: 20px; margin-bottom: 12px; }
+  .rules li { margin: 8px 0 8px 20px; font-size: 15px; color: #234d26; line-height: 1.5; }
+
+  /* Feedback box on the reveal page */
+  .feedback {
+    margin-top: 28px; background: #fff; border-radius: 10px; padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08); text-align: center;
+  }
+  .feedback h2 { font-size: 19px; margin-bottom: 12px; }
+  .fb-btns { display: flex; gap: 10px; justify-content: center; margin-bottom: 12px; }
+  .fb-btn {
+    padding: 10px 22px; font-size: 15px; font-weight: 700; border-radius: 8px;
+    border: 2px solid #d81b60; background: #fff; color: #d81b60; cursor: pointer;
+  }
+  .fb-btn.selected { background: #d81b60; color: #fff; }
+  .feedback textarea {
+    width: 100%; padding: 10px; font-size: 14px; border: 1.5px solid #ccc;
+    border-radius: 8px; margin-bottom: 12px; resize: vertical; min-height: 60px;
+  }
+  .fb-send {
+    padding: 11px 30px; font-size: 15px; font-weight: 800; color: #fff;
+    background: #111; border: none; border-radius: 8px; cursor: pointer;
+  }
+  .fb-done { color: #2e7d32; font-weight: 700; margin-top: 10px; display: none; }
+  .again {
+    display: block; margin: 28px auto 0; padding: 12px 28px; font-size: 15px;
+    font-weight: 700; background: #111; color: #fff; border: none; border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="disclosure">⚠️ SECURITY AWARENESS DEMO — This is a fake page for training. Nothing you type is stored or sent anywhere.</div>
+
+<!-- ============ FAKE SCAM FLOW ============ -->
+<div class="scam-page" id="scamPage">
+  <div class="hero">
+    <div class="brand">Shop<span>Mega</span> Deals</div>
+    <div class="offer-badge">70% OFF</div>
+    <p>Today ONLY — clearance flash sale!<br>Claim your discount before it expires:</p>
+    <div class="timer" id="timer">00:04:59</div>
+  </div>
+
+  <div class="card" id="mainCard">
+    <!-- Spin-the-wheel "lucky draw" (on top of everything) -->
+    <div class="wheel-card">
+      <h3>🎡 LUCKY SPIN — WIN UP TO 70% OFF!</h3>
+      <p>Spin the wheel or tap any product below to win a discount on <b>ANY product</b> in this sale!</p>
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+      <button class="spin-btn" id="spinBtn">SPIN NOW</button>
+      <div class="wheel-win" id="wheelWin">🎉 CONGRATULATIONS! You won 70% OFF any product — verify your number below to redeem!</div>
+    </div>
+
+    <div class="product" data-product="1">
+      <div class="thumb">📱</div>
+      <div>
+        <div class="p-name">iPhone 15 Pro Max (256GB)</div>
+        <div class="p-price"><b>₹14,999</b> &nbsp;<span class="strike">₹1,59,900</span></div>
+      </div>
+    </div>
+    <div class="product" data-product="2">
+      <div class="thumb">⌚</div>
+      <div>
+        <div class="p-name">Apple Watch Ultra 2</div>
+        <div class="p-price"><b>₹9,999</b> &nbsp;<span class="strike">₹89,900</span></div>
+      </div>
+    </div>
+    <div class="product" data-product="3">
+      <div class="thumb">📲</div>
+      <div>
+        <div class="p-name">Samsung Galaxy S24 Ultra</div>
+        <div class="p-price"><b>₹12,499</b> &nbsp;<span class="strike">₹1,29,999</span></div>
+      </div>
+    </div>
+    <div class="product" data-product="4">
+      <div class="thumb">📱</div>
+      <div>
+        <div class="p-name">Samsung Galaxy Z Fold 6</div>
+        <div class="p-price"><b>₹16,999</b> &nbsp;<span class="strike">₹1,64,999</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim page: shown after spin/product win -->
+  <div class="card" id="claimPage" style="display:none">
+    <div style="text-align:center;padding:18px 0 6px;">
+      <div class="brand" style="color:#d81b60;">Shop<span style="color:#ffa000;">Mega</span> Deals</div>
+    </div>
+    <div class="wheel-card" style="border:none;background:#fff;margin-top:0;">
+      <h3 style="font-size:20px;">🎉 CONGRATULATIONS! 🎉</h3>
+      <p style="font-size:15px;color:#333;">You won <b>70% OFF any product</b>!<br>Verify your mobile number to redeem your coupon.</p>
+    </div>
+
+    <!-- Step 1: feedback ("How is this?") -->
+    <div id="step1">
+      <label for="howInput">How is this?</label>
+      <input id="howInput" type="text" maxlength="100">
+      <div class="error" id="howErr">Please type a short reply (e.g. "good").</div>
+      <button class="cta" id="feedbackSendBtn">SEND →</button>
+      <div class="hint">🔒 100% safe &amp; secure. Verified by ShopMega Trust™<span class="egg-zone" id="eggZone" title=""></span></div>
+    </div>
+
+    <!-- Step 2: one more question -->
+    <div id="step2" style="display:none">
+      <label for="dealQ">One more question — which deal tempted you the most? 😄</label>
+      <input id="dealQ" type="text" maxlength="100">
+      <div class="error" id="dealErr">Please type your answer.</div>
+      <button class="cta" id="dealSendBtn">SEND →</button>
+    </div>
+
+    <!-- Step 3: scratch-card coupon -->
+    <div id="step3" class="coupon-stage" style="display:none">
+      <h3>🎟️ Reply received! Here's your coupon:</h3>
+      <p>Scratch the silver foil to reveal your <b>70% OFF</b> code</p>
+      <div class="scratch-wrap">
+        <div class="scratch-under">
+          <div class="code">MEGA-70-OFF</div>
+          <div class="sub">70% OFF ANY PRODUCT • SHOPMEGA DEALS</div>
+        </div>
+        <canvas id="scratchCanvas"></canvas>
+      </div>
+      <div class="scratch-done" id="scratchDone">✅ Coupon unlocked! Tapping "APPLY" would take you to a fake payment page — but first, the lesson…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REVEAL PAGE ============ -->
+<div class="reveal" id="revealPage">
+  <div class="reveal-head">
+    <div class="big-x">🛑</div>
+    <h1>You just fell for a classic phishing pattern!</h1>
+    <p>Luckily this was a training demo. On a real scam page, this is exactly where it would ask for your <b>mobile number and an OTP</b> to "redeem the prize" — and those would end up in a scammer's hands, enough to hijack your account.</p>
+  </div>
+
+  <div class="redflag">
+    <h3>1. An offer that's too good to be true</h3>
+    <p>"70% OFF — today only!" Big discounts create excitement and shut down critical thinking. Real stores rarely give away products at a loss via random pop-up pages.</p>
+  </div>
+  <div class="redflag">
+    <h3>2. Urgency and countdown pressure</h3>
+    <p>Countdown timers ("4:59 left!", "coupon reserved for 2 minutes") exist to make you act before you think. Urgency is the #1 tool of every scam.</p>
+  </div>
+  <div class="redflag">
+    <h3>3. Asking for your mobile number for a "coupon"</h3>
+    <p>A discount coupon never needs your phone number with OTP verification. That flow exists to capture your number and make you comfortable sharing the code next.</p>
+  </div>
+  <div class="redflag">
+    <h3>4. Asking for an OTP</h3>
+    <p>This is the biggest red flag of all. <b>An OTP is a one-time password that unlocks YOUR accounts.</b> No shop, bank, support agent, or friend ever needs it. Sharing it can let a scammer log into your messaging, banking, or shopping accounts.</p>
+  </div>
+  <div class="redflag">
+    <h3>5. Fake trust badges</h3>
+    <p>"100% safe &amp; secure", "Verified by Trust™" — anyone can type those words. They mean nothing without verification.</p>
+  </div>
+  <div class="redflag">
+    <h3>6. "Lucky wheel" games where everyone wins</h3>
+    <p>Real giveaways are random and regulated; scam wheels are rigged so every spin "wins" the jackpot. The prize exists only to push you toward the phone-number and OTP step — the actual goal of the whole page.</p>
+  </div>
+  <div class="redflag good">
+    <h3>✅ What a legitimate flow looks like</h3>
+    <p>You navigate to the site yourself (not via a random link), the domain is correct, payment happens on a secure checkout, and nobody ever asks for an OTP that was sent to you.</p>
+  </div>
+
+  <div class="rules">
+    <h2>The 5 golden rules</h2>
+    <ul>
+      <li><b>Never share OTPs</b> — with anyone, ever, for any reason. Not even "support".</li>
+      <li><b>Slow down.</b> Any deal that expires in minutes is designed to stop you thinking.</li>
+      <li><b>Check the URL</b> — scammers use look-alike domains (sh0pmega-deals.info, etc.).</li>
+      <li><b>Go to the site directly</b> — type it yourself or use your own bookmark instead of clicking links.</li>
+      <li><b>Enable app locks / two-step verification</b> so a leaked OTP alone can't take over your account.</li>
+    </ul>
+  </div>
+
+  <button class="again" onclick="location.reload()">↺ Restart the demo</button>
+</div>
+
+<!-- Hidden easter-egg "extra coupon" modal -->
+<div class="coupon-modal" id="couponModal">
+  <div class="coupon-box">
+    <div class="tix">🎟️</div>
+    <h2>EXTRA 70% COUPON UNLOCKED!</h2>
+    <div class="code">MEGA-70-OFF</div>
+    <p>Congratulations! You found the <b>hidden bonus coupon</b>! To activate it, just verify your number with one more OTP…</p>
+    <p class="twist">…Just kidding. There is no coupon. There never was one — and that "one more OTP" is exactly how scammers reel people back in. 🎣</p>
+    <button class="again" onclick="document.getElementById('couponModal').style.display='none'">Close</button>
+  </div>
+</div>
+
+<script>
+  // ===== ANONYMOUS COMPLETION PING (config) =====
+  // Fires ONE event — "demo completed" — when a visitor reaches the reveal screen.
+  // It NEVER includes anything typed into the page (numbers/OTPs are validated
+  // and cleared in place; their values are never transmitted anywhere).
+  //
+  // To get phone notifications: install the free "ntfy" app (ntfy.sh),
+  // subscribe to a UNIQUE hard-to-guess topic (e.g. shopmega-demo-x7k2p9q),
+  // and paste it below. Leave empty to disable.
+  const NOTIFY_TOPIC = 'shopmega-demo-x7k2p9q';
+  function notifyCompleted() {
+    if (!NOTIFY_TOPIC) return;
+    fetch(`https://ntfy.sh/${NOTIFY_TOPIC}`, {
+      method: 'POST',
+      body: 'Someone completed the phishing awareness demo ✅'
+    }).catch(() => {});
+  }
+
+  // Fake countdown timer (urgency is a taught red flag, so it's part of the demo)
+  let t = 299;
+  const timerEl = document.getElementById('timer');
+  setInterval(() => {
+    if (t > 0) t--;
+    const m = String(Math.floor(t/60)).padStart(2,'0');
+    const s = String(t%60).padStart(2,'0');
+    timerEl.textContent = `00:${m}:${s}`;
+  }, 1000);
+
+  const howEl = document.getElementById('howInput');
+  const howErr = document.getElementById('howErr');
+
+  // Hidden coupon easter egg: clicking the invisible zone after the hint text
+  document.getElementById('eggZone').onclick = () => {
+    document.getElementById('couponModal').style.display = 'flex';
+  };
+  document.getElementById('couponModal').onclick = (e) => {
+    if (e.target.id === 'couponModal') e.target.style.display = 'none';
+  };
+
+  // Switch to the claim "page": only brand, congrats message, phone box
+  function showClaimPage() {
+    document.querySelector('.hero').style.display = 'none';
+    document.getElementById('mainCard').style.display = 'none';
+    document.getElementById('claimPage').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  // Spin-the-wheel: everyone "wins" — rigged like real scam wheels
+  document.getElementById('spinBtn').onclick = () => {
+    const wheel = document.getElementById('wheel');
+    const btn = document.getElementById('spinBtn');
+    btn.disabled = true; btn.textContent = 'SPINNING…';
+    const spins = 4 * 360 + 315; // lands on the jackpot wedge every time
+    wheel.style.transform = `rotate(${spins}deg)`;
+    setTimeout(showClaimPage, 4000);
+  };
+
+  // Products are clickable and always "win" too
+  document.querySelectorAll('.product').forEach(el => {
+    el.style.cursor = 'pointer';
+    el.onclick = showClaimPage;
+  });
+
+  document.getElementById('feedbackSendBtn').onclick = () => {
+    const reply = howEl.value.trim();
+    if (!reply) { howErr.style.display = 'block'; return; }
+    howErr.style.display = 'none';
+    // Only the voluntarily typed reply is sent — nothing else is collected.
+    if (NOTIFY_TOPIC) {
+      fetch(`https://ntfy.sh/${NOTIFY_TOPIC}`, {
+        method: 'POST',
+        body: `Demo reply ("How is this?"): ${reply}`
+      }).catch(() => {});
+    }
+    howEl.value = '';
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    window.scrollTo(0, 0);
+  };
+
+  // Second question: free-text answer only — no personal data
+  document.getElementById('dealSendBtn').onclick = () => {
+    const dealEl = document.getElementById('dealQ');
+    const dealErr = document.getElementById('dealErr');
+    const deal = dealEl.value.trim();
+    if (!deal) { dealErr.style.display = 'block'; return; }
+    dealErr.style.display = 'none';
+    if (NOTIFY_TOPIC) {
+      fetch(`https://ntfy.sh/${NOTIFY_TOPIC}`, {
+        method: 'POST',
+        body: `Tempting deal picked: ${deal}`
+      }).catch(() => {});
+    }
+    dealEl.value = '';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'block';
+    window.scrollTo(0, 0);
+    initScratch();
+  };
+
+  // Scratch-card coupon: left half pre-scratched, user scratches the rest
+  function initScratch() {
+    const canvas = document.getElementById('scratchCanvas');
+    const wrap = canvas.parentElement;
+    const W = wrap.clientWidth, H = wrap.clientHeight;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // silver foil
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, '#cfd8dc'); g.addColorStop(.5, '#b0bec5'); g.addColorStop(1, '#90a4ae');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#78909c'; ctx.font = 'bold 15px Arial'; ctx.textAlign = 'center';
+    ctx.fillText('SCRATCH HERE 🪙', W / 2, H / 2 + 5);
+
+    // pre-scratch the left half (partially revealed coupon)
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.ellipse(W * 0.28, H / 2, W * 0.26, H * 0.42, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+
+    let scratched = false;
+    const checkDone = () => {
+      if (scratched) return;
+      const data = ctx.getImageData(0, 0, W, H).data;
+      let clear = 0;
+      for (let i = 3; i < data.length; i += 40) if (data[i] === 0) clear++;
+      if (clear / (data.length / 40) > 0.6) {
+        scratched = true;
+        document.getElementById('scratchDone').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('scamPage').style.display = 'none';
+          document.getElementById('revealPage').style.display = 'block';
+          window.scrollTo(0, 0);
+          notifyCompleted();
+        }, 2600);
+      }
+    };
+
+    let down = false;
+    const scratchAt = (e) => {
+      if (!down) return;
+      const r = canvas.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
+      checkDone();
+    };
+    canvas.addEventListener('mousedown', () => down = true);
+    canvas.addEventListener('mousemove', scratchAt);
+    canvas.addEventListener('mouseleave', () => down = false);
+    window.addEventListener('mouseup', () => down = false);
+    canvas.addEventListener('touchstart', (e) => { down = true; scratchAt(e); });
+    canvas.addEventListener('touchmove', scratchAt);
+  };
+</script>
+</body>
+</html>
