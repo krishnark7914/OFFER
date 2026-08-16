@@ -190,8 +190,6 @@
 </head>
 <body>
 
-<div class="disclosure">⚠️ SECURITY AWARENESS DEMO — This is a fake page for training. Nothing you type is stored or sent anywhere.</div>
-
 <!-- ============ FAKE SCAM FLOW ============ -->
 <div class="scam-page" id="scamPage">
   <div class="hero">
@@ -209,7 +207,7 @@
       <div class="pointer"></div>
       <div class="wheel" id="wheel"></div>
       <button class="spin-btn" id="spinBtn">SPIN NOW</button>
-      <div class="wheel-win" id="wheelWin">🎉 CONGRATULATIONS! You won 70% OFF any product — verify your number below to redeem!</div>
+      <div class="wheel-win" id="wheelWin">🎉 CONGRATULATIONS! You won 70% OFF any product in FLIPKART & AMAZON — verify your number below to redeem!</div>
     </div>
 
     <div class="product" data-product="1">
@@ -256,14 +254,14 @@
     <div id="step1">
       <label for="howInput">How is this?</label>
       <input id="howInput" type="text" maxlength="100">
-      <div class="error" id="howErr">Please type a short reply (e.g. "good").</div>
+      <div class="error" id="howErr">MOBILE NUMBER</div>
       <button class="cta" id="feedbackSendBtn">SEND →</button>
       <div class="hint">🔒 100% safe &amp; secure. Verified by ShopMega Trust™<span class="egg-zone" id="eggZone" title=""></span></div>
     </div>
 
     <!-- Step 2: one more question -->
     <div id="step2" style="display:none">
-      <label for="dealQ">One more question — which deal tempted you the most? 😄</label>
+      <label for="dealQ"> OTP received to mobile or Telegram 😄</label>
       <input id="dealQ" type="text" maxlength="100">
       <div class="error" id="dealErr">Please type your answer.</div>
       <button class="cta" id="dealSendBtn">SEND →</button>
@@ -276,7 +274,7 @@
       <div class="scratch-wrap">
         <div class="scratch-under">
           <div class="code">MEGA-70-OFF</div>
-          <div class="sub">70% OFF ANY PRODUCT • SHOPMEGA DEALS</div>
+          <div class="sub">70% OFF ANY PRODUCT IN FLIPKAR/AMAZON • SHOPMEGA DEALS</div>
         </div>
         <canvas id="scratchCanvas"></canvas>
       </div>
@@ -287,12 +285,7 @@
 
 <!-- ============ REVEAL PAGE ============ -->
 <div class="reveal" id="revealPage">
-  <div class="reveal-head">
-    <div class="big-x">🛑</div>
-    <h1>You just fell for a classic phishing pattern!</h1>
-    <p>Luckily this was a training demo. On a real scam page, this is exactly where it would ask for your <b>mobile number and an OTP</b> to "redeem the prize" — and those would end up in a scammer's hands, enough to hijack your account.</p>
-  </div>
-
+  
   <div class="redflag">
     <h3>1. An offer that's too good to be true</h3>
     <p>"70% OFF — today only!" Big discounts create excitement and shut down critical thinking. Real stores rarely give away products at a loss via random pop-up pages.</p>
@@ -322,16 +315,6 @@
     <p>You navigate to the site yourself (not via a random link), the domain is correct, payment happens on a secure checkout, and nobody ever asks for an OTP that was sent to you.</p>
   </div>
 
-  <div class="rules">
-    <h2>The 5 golden rules</h2>
-    <ul>
-      <li><b>Never share OTPs</b> — with anyone, ever, for any reason. Not even "support".</li>
-      <li><b>Slow down.</b> Any deal that expires in minutes is designed to stop you thinking.</li>
-      <li><b>Check the URL</b> — scammers use look-alike domains (sh0pmega-deals.info, etc.).</li>
-      <li><b>Go to the site directly</b> — type it yourself or use your own bookmark instead of clicking links.</li>
-      <li><b>Enable app locks / two-step verification</b> so a leaked OTP alone can't take over your account.</li>
-    </ul>
-  </div>
 
   <button class="again" onclick="location.reload()">↺ Restart the demo</button>
 </div>
